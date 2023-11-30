@@ -3,7 +3,7 @@ Import-Module ActiveDirectory
 while($True)
 {
     $way_to_res = Read-Host "Введите сервер "
-    $way_to_res1 = '\\' + $way_to_res + '\Otdel'
+    $way_to_res1 = '\\' + $way_to_res + '\Office'
     Get-ChildItem -Path $way_to_res1 | Format-table Name
     
     while($True){

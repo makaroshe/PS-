@@ -1,0 +1,146 @@
+clear
+############################################ GUI
+Add-Type -assembly System.Windows.Forms
+$main_form = New-Object System.Windows.Forms.Form
+$main_form.Text ='GUI for my PowerShell script'
+$main_form.Width = 600
+$main_form.Height = 600
+$main_form.AutoSize = $true
+
+$Label = New-Object System.Windows.Forms.Label
+$Label.Text = "Укажите город своего подразделения"
+$Label.Location = New-Object System.Drawing.Point(0,10)
+$Label.AutoSize = $true
+$main_form.Controls.Add($Label)
+
+$ComboBox = New-Object System.Windows.Forms.ComboBox
+$ComboBox.Width = 200
+$Users = "Город1", "Город2", "Город3"
+Foreach ($User in $Users)
+
+{$ComboBox.Items.Add($User)
+clear
+echo = "Закройте ЭТО ОКНО, чтобы закрыть приложения"}
+
+$ComboBox.Location  = New-Object System.Drawing.Point(0,30)
+$main_form.Controls.Add($ComboBox)
+
+$ComboBox05 = New-Object System.Windows.Forms.ComboBox
+$ComboBox05.Location  = New-Object System.Drawing.Point(0,80)
+$ComboBox05.Width = 200
+$main_form.Controls.Add($ComboBox05)
+
+$ComboBox1 = New-Object System.Windows.Forms.ComboBox
+$ComboBox1.Location  = New-Object System.Drawing.Point(0,130)
+$ComboBox1.Width = 200
+$main_form.Controls.Add($ComboBox1)
+
+$ComboBox2 = New-Object System.Windows.Forms.ComboBox
+$ComboBox2.Location  = New-Object System.Drawing.Point(0,180)
+$ComboBox2.Width = 200
+$main_form.Controls.Add($ComboBox2)
+
+$Label3 = New-Object System.Windows.Forms.Label
+$Label3.Text = ""
+$Label3.Location  = New-Object System.Drawing.Point(0,170)
+$Label3.AutoSize = $true
+$main_form.Controls.Add($Label3)
+
+$Button1 = New-Object System.Windows.Forms.Button
+$Button1.Location = New-Object System.Drawing.Size(200,29)
+$Button1.Size = New-Object System.Drawing.Size(120,23)
+$Button1.Text = "Поиск1"
+$main_form.Controls.Add($Button1)
+
+
+$Button05 = New-Object System.Windows.Forms.Button
+$Button05.Location = New-Object System.Drawing.Size(200,79)
+$Button05.Size = New-Object System.Drawing.Size(120,23)
+$Button05.Text = "Поиск2"
+$main_form.Controls.Add($Button05)
+
+$Button2 = New-Object System.Windows.Forms.Button
+$Button2.Location = New-Object System.Drawing.Size(200,129)
+$Button2.Size = New-Object System.Drawing.Size(120,23)
+$Button2.Text = "Поиск3"
+$main_form.Controls.Add($Button2)
+
+while($True)
+{
+$Button1.Add_Click(
+{
+###################################################################################### Выбираем город, получаем файловый сервер и список ресурсов внутри сервера
+if ( $ComboBox.selectedItem -eq "Город1" )
+    {$serv = "serv1"
+    $ComboBox05.DataSource = $serv, ""
+    $otdel = '\\' + $serv + '\Otdel'
+    $otdelFolders = Get-ChildItem -Path $otdel -Name
+    $ComboBox1.DataSource = $otdelFolders}
+
+elseif ( $ComboBox.selectedItem -eq "Город2" )
+    {$serv = "serv2"
+    $ComboBox05.DataSource = $serv, ""
+    $otdel = '\\' + $serv + '\Otdel'
+    $otdelFolders = Get-ChildItem -Path $otdel -Name
+    $ComboBox1.DataSource = $otdelFolders}
+
+elseif ( $ComboBox.selectedItem -eq "Город3" )
+    {$serv = "serv3"
+    $ComboBox05.DataSource = $serv, ""
+    $otdel = '\\' + $serv + '\Otdel'
+    $otdelFolders = Get-ChildItem -Path $otdel -Name
+    $ComboBox1.DataSource = $otdelFolders}
+
+###################################################################################### Вибраем город, получаем несколько серверов, которые стоят за этим городом
+if ( $ComboBox.selectedItem -eq "Город4" )
+    {$serv = "serv4.1", "serv4.2", "serv4.3"
+    $ComboBox05.DataSource = $serv}
+
+elseif ( $ComboBox.selectedItem -eq "Город5" )
+    {$serv = "serv5.1", "serv5.2"
+    $ComboBox05.DataSource = $serv
+    $otdel = '\\' + $serv + '\Otdel'
+    $otdelFolders = Get-ChildItem -Path $otdel -Name
+    $ComboBox1.DataSource = $otdelFolders}
+
+}
+)
+###################################################################################### Выбираем один из нескольких серверов, что стоят за городом, получаем фаловые ресурсы этого сервера
+$Button05.Add_Click(
+{
+if ( $ComboBox.selectedItem -eq "Город4" -or $ComboBox.selectedItem -eq "Город5")
+    {$otdel = '\\' + $ComboBox05.selectedItem + '\Otdel'
+    $otdelFolders = Get-ChildItem -Path $otdel -Name
+    $ComboBox1.DataSource = $otdelFolders}
+}
+)
+
+$Button2.Add_Click(
+{
+###################################################################################### Выбираем файловый ресурс, получаем список групп безопасности, что могут входить в него (те города, за которыми закреплен 1 сервак
+if ( $ComboBox.selectedItem -eq "Город1" )
+    {$fin = '\\' + "serv1" + '\Otdel' + '\' + $ComboBox1.selectedItem
+    $lol = (Get-Acl $fin).Access.IdentityReference.Value
+    $ComboBox2.DataSource = $lol}
+
+elseif ( $ComboBox.selectedItem -eq "Город2" )
+    {$fin = '\\' + "serv2" + '\Otdel' + '\' + $ComboBox1.selectedItem
+    $lol = (Get-Acl $fin).Access.IdentityReference.Value
+    $ComboBox2.DataSource = $lol}
+
+###################################################################################### Выбираем файловый ресурс, получаем список групп безопасности, что могут входить в него (те города, за которыми закреплено несколько серваков
+if ( $ComboBox.selectedItem -eq "Город4" )
+    {$fin = '\\' + $ComboBox05.selectedItem + '\Otdel' + '\' + $ComboBox1.selectedItem
+    $lol = (Get-Acl $fin).Access.IdentityReference.Value
+    $ComboBox2.DataSource = $lol}
+
+elseif ( $ComboBox.selectedItem -eq "Город5" )
+    {$fin = '\\' + $ComboBox05.selectedItem + '\Otdel' + '\' + $ComboBox1.selectedItem
+    $lol = (Get-Acl $fin).Access.IdentityReference.Value
+    $ComboBox2.DataSource = $lol}
+
+}
+)
+
+$main_form.ShowDialog()
+}
